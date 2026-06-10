@@ -38,6 +38,7 @@ class UpcomingRemoteViewsFactory(private val context: Context) : RemoteViewsServ
     override fun getCount(): Int = upcomingMoments.size
 
     // Inside WidgetService.kt -> override fun getViewAt(position: Int): RemoteViews
+// Inside WidgetService.kt -> override fun getViewAt(position: Int): RemoteViews
     override fun getViewAt(position: Int): RemoteViews {
         val views = RemoteViews(context.packageName, R.layout.widget_item_row)
         val moment = upcomingMoments[position]
@@ -53,7 +54,6 @@ class UpcomingRemoteViewsFactory(private val context: Context) : RemoteViewsServ
         var totalDays = diff / (1000 * 60 * 60 * 24)
 
         // 2. Check if there's any remaining fractional time left over
-        // (e.g., hours, minutes, or seconds remaining in that partial day)
         val remainder = diff % (1000 * 60 * 60 * 24)
 
         // 3. If there is ANY time remaining, round it up to the next full day
@@ -61,13 +61,16 @@ class UpcomingRemoteViewsFactory(private val context: Context) : RemoteViewsServ
             totalDays += 1
         }
 
-        // Double check: If it calculates to 0 but it's technically a future date, force it to 1 day
+        // If it calculates to 0 but it's technically a future date, force it to 1 day
         if (totalDays == 0L && diff > 0) {
             totalDays = 1
         }
 
-        // Text composition: 6/11/26 Food Stamps (1 days)
-        views.setTextViewText(R.id.txtWidgetItem, "$dateStr ${moment.title} ($totalDays days)")
+        // ✅ FIXED PLURALIZATION: Check if totalDays is exactly 1
+        val dayLabel = if (totalDays == 1L) "day" else "days"
+
+        // Text composition: 6/11/26 Food Stamps (1 day) vs (2 days)
+        views.setTextViewText(R.id.txtWidgetItem, "$dateStr ${moment.title} ($totalDays $dayLabel)")
 
         return views
     }
