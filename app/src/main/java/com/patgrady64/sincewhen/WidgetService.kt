@@ -21,16 +21,21 @@ class UpcomingRemoteViewsFactory(private val context: Context) : RemoteViewsServ
     override fun onCreate() {}
 
     override fun onDataSetChanged() {
-        // Read current tracking data from shared preferences
-        val json = context.getSharedPreferences("Prefs", Context.MODE_PRIVATE).getString("list", null)
-        if (json != null) {
-            val allMoments: List<Moment> = Gson().fromJson(json, object : TypeToken<MutableList<Moment>>() {}.type)
-            val now = System.currentTimeMillis()
 
-            // Filter for future dates, ignoring events happening today
-            upcomingMoments = allMoments.filter { it.timestamp > now && !isSameDay(it.timestamp, now) }
-                .sortedBy { it.timestamp } // Show closest events first
-        }
+        val prefs = context.getSharedPreferences("Prefs", Context.MODE_PRIVATE)
+
+        val json = prefs.getString("list", "[]") ?: "[]"
+
+        val type = object : TypeToken<List<Moment>>() {}.type
+
+        val allMoments: List<Moment> =
+            Gson().fromJson(json, type)
+
+        val now = System.currentTimeMillis()
+
+        upcomingMoments = allMoments
+            .filter { it.timestamp > now && !isSameDay(it.timestamp, now) }
+            .sortedBy { it.timestamp }
     }
 
     override fun onDestroy() {}

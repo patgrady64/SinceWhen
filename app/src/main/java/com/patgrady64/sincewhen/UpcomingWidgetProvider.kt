@@ -10,6 +10,7 @@ import android.widget.RemoteViews
 
 class UpcomingWidgetProvider : AppWidgetProvider() {
 
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_upcoming)
@@ -33,15 +34,30 @@ class UpcomingWidgetProvider : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds)
+
+
     }
 
     companion object {
         // Helper function to force-refresh the data display inside the widget
         fun refreshWidget(context: Context) {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val componentName = ComponentName(context, UpcomingWidgetProvider::class.java)
-            val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widgetListView)
+            val manager = AppWidgetManager.getInstance(context)
+            val ids = manager.getAppWidgetIds(
+                ComponentName(context, UpcomingWidgetProvider::class.java)
+            )
+
+            // 1. Force dataset reload
+            manager.notifyAppWidgetViewDataChanged(ids, R.id.widgetListView)
+
+            // 2. Force full widget redraw (IMPORTANT FIX)
+            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                component = ComponentName(context, UpcomingWidgetProvider::class.java)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            }
+
+            context.sendBroadcast(intent)
         }
+
+
     }
 }

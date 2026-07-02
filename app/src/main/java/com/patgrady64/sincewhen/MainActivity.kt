@@ -1,11 +1,13 @@
 package com.patgrady64.sincewhen
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,12 +20,11 @@ import com.google.gson.reflect.TypeToken
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-
     lateinit var adapter: MomentAdapter
     var moments = mutableListOf<Moment>()
     lateinit var header: TextView
-
     private val countdownHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private lateinit var itemTouchHelper: ItemTouchHelper
 
     private val countdownRunnable = object : Runnable {
         override fun run() {
@@ -56,22 +57,79 @@ class MainActivity : AppCompatActivity() {
         updateHeader()
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = MomentAdapter(moments)
+        recyclerView.itemAnimator = null
+
+        // 1. Updated Adapter Initialization: Passes the drag command up to our touch helper
+        adapter = MomentAdapter(moments) { viewHolder ->
+            itemTouchHelper.startDrag(viewHolder)
+        }
         recyclerView.adapter = adapter
 
-        // Drag and drop setup
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-                Collections.swap(moments, vh.adapterPosition, target.adapterPosition)
-                adapter.notifyItemMoved(vh.adapterPosition, target.adapterPosition)
-                saveMoments()
+        // 2. Updated Touch Helper: Rejects automatic tracking to stop glitchy scrolling interferences
+        itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
+        ) {
+            // TURN THIS OFF: Stops the layout from picking up items on random long-presses
+            override fun isLongPressDragEnabled(): Boolean = false
+
+            override fun onSelectedChanged(
+                viewHolder: RecyclerView.ViewHolder?,
+                actionState: Int
+            ) {
+                super.onSelectedChanged(viewHolder, actionState)
+
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    countdownHandler.removeCallbacks(countdownRunnable)
+                }
+            }
+
+            override fun onMove(
+                rv: RecyclerView,
+                vh: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+
+                val from = vh.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
+
+                if (from < to) {
+                    for (i in from until to) {
+                        Collections.swap(moments, i, i + 1)
+                    }
+                } else {
+                    for (i in from downTo to + 1) {
+                        Collections.swap(moments, i, i - 1)
+                    }
+                }
+
+                adapter.notifyItemMoved(from, to)
                 return true
             }
+
             override fun onSwiped(vh: RecyclerView.ViewHolder, dir: Int) {}
-        }).attachToRecyclerView(recyclerView)
 
-        findViewById<FloatingActionButton>(R.id.fabAdd).setOnClickListener { showMomentDialog(null) }
+            // Saves the list order to disk ONLY when the user physically lets go of the item
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                super.clearView(recyclerView, viewHolder)
 
+                saveMoments()
+
+                countdownHandler.post(countdownRunnable)
+            }
+        })
+
+        // Attach the optimized handle-driven config to your layout
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
+        // Wire up your Floating Action Button for adding new moments
+        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAdd).setOnClickListener {
+            showMomentDialog(null)
+        }
+
+        // Wire up your settings gear icon to launch the backup system panel
         findViewById<android.widget.ImageButton>(R.id.btnSettings).setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             settingsLauncher.launch(intent)
@@ -248,19 +306,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveMoments() {
-        getSharedPreferences("Prefs", MODE_PRIVATE)
-            .edit()
-            .putString("list", Gson().toJson(moments))
-            .apply()
+        getSharedPreferences("Prefs", MODE_PRIVATE).edit {
+            putString("list", Gson().toJson(moments))
+        }
 
         // Sync local adjustments out to the widget interface view provider
         UpcomingWidgetProvider.refreshWidget(this)
     }
 
     private fun loadMoments() {
-        val json = getSharedPreferences("Prefs", MODE_PRIVATE).getString("list", null)
-        if (json != null) {
-            moments = Gson().fromJson(json, object : TypeToken<MutableList<Moment>>() {}.type)
-        }
+        val json = getSharedPreferences("Prefs", MODE_PRIVATE)
+            .getString("list", "[]") ?: "[]"
+
+        val type = object : TypeToken<MutableList<Moment>>() {}.type
+
+        moments.clear()
+        moments.addAll(
+            Gson().fromJson(json, type)
+        )
     }
+
 }
