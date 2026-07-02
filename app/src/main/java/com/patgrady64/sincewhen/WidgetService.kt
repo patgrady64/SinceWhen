@@ -72,6 +72,9 @@ class UpcomingRemoteViewsFactory(private val context: Context) : RemoteViewsServ
         // Text composition: 6/11/26 Food Stamps (1 day) vs (2 days)
         views.setTextViewText(R.id.txtWidgetItem, "$dateStr ${moment.title} ($totalDays $dayLabel)")
 
+        val fillInIntent = Intent()
+        views.setOnClickFillInIntent(R.id.txtWidgetItem, fillInIntent)
+
         return views
     }
 

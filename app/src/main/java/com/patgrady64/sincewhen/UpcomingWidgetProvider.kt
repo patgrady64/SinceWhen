@@ -21,6 +21,15 @@ class UpcomingWidgetProvider : AppWidgetProvider() {
             }
             views.setRemoteAdapter(R.id.widgetListView, intent)
 
+            val appIntent = Intent(context, MainActivity::class.java)
+            val pendingIntent = android.app.PendingIntent.getActivity(
+                context,
+                0,
+                appIntent,
+                android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
+            )
+            views.setPendingIntentTemplate(R.id.widgetListView, pendingIntent)
+
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds)

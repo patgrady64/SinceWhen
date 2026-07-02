@@ -1,7 +1,9 @@
 package com.patgrady64.sincewhen
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -32,6 +34,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val settingsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // Backup was restored! Reload memory arrays, adapt views, and redraw interfaces
+            loadMoments()
+            adapter.notifyDataSetChanged()
+            updateHeader()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -58,6 +71,11 @@ class MainActivity : AppCompatActivity() {
         }).attachToRecyclerView(recyclerView)
 
         findViewById<FloatingActionButton>(R.id.fabAdd).setOnClickListener { showMomentDialog(null) }
+
+        findViewById<android.widget.ImageButton>(R.id.btnSettings).setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            settingsLauncher.launch(intent)
+        }
 
         // Kickstart the precise background midnight widget updating routine
         WidgetUpdateWorker.scheduleMidnightUpdate(this)

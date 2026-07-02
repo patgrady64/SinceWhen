@@ -4,7 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#121212">
-
+    <ImageButton
+        android:id="@+id/btnSettings"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_manage"
+        android:contentDescription="Settings" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
