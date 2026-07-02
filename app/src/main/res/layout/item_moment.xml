@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- DRAG HANDLE (STRICT TOUCH TARGET) -->
+        <!-- DRAG HANDLE -->
         <ImageView
             android:id="@+id/imgDragHandle"
             android:layout_width="40dp"
@@ -55,12 +55,10 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:paddingBottom="4dp"
             app:layout_constraintStart_toEndOf="@id/imgDragHandle"
             app:layout_constraintEnd_toStartOf="@id/btnEdit"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/txtDuration"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintBottom_toTopOf="@id/txtDuration" />
 
         <!-- DURATION -->
         <TextView

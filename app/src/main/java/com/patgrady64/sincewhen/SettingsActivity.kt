@@ -1,16 +1,22 @@
 package com.patgrady64.sincewhen
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import androidx.core.content.edit
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -32,17 +38,80 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        findViewById<Button>(R.id.btnSettingsBack).setOnClickListener { finish() }
+        SettingsRow(findViewById(R.id.rowClearAll))
+            .setTitle("Clear All Moments")
+            .setSubtitle("Delete everything stored")
+            .onClick { showClearDialog() }
 
-        findViewById<Button>(R.id.btnExportBackup).setOnClickListener {
-            // Prompts file picker to name a new backup file
-            createBackupFileLauncher.launch("SinceWhen_Backup.json")
-        }
+        SettingsRow(findViewById(R.id.rowWidget))
+            .setTitle("Widget")
+            .setSubtitle("Refresh widgets")
+            .onClick { refreshWidget() }
 
-        findViewById<Button>(R.id.btnImportBackup).setOnClickListener {
-            // Prompts file picker to look up an existing JSON file
-            importBackupFileLauncher.launch(arrayOf("*/*"))
+        SettingsRow(findViewById(R.id.rowTheme))
+            .setTitle("Theme")
+            .setSubtitle("Dark mode and colors")
+            .onClick { showComingSoon() }
+
+        SettingsRow(findViewById(R.id.rowExport))
+            .setTitle("Export Backup")
+            .setSubtitle("Save your moments to a file")
+            .onClick { exportBackup() }
+
+        SettingsRow(findViewById(R.id.rowImport))
+            .setTitle("Import Backup")
+            .setSubtitle("Restore from file")
+            .onClick { importBackup() }
+
+        findViewById<ImageButton>(R.id.btnSettingsBack).setOnClickListener {
+            finish()
         }
+    }
+
+    private fun refreshWidget() {
+        UpcomingWidgetProvider.refreshWidget(this)
+    }
+
+    private fun showComingSoon() {
+        Toast.makeText(this, "Coming soon", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun exportBackup() {
+        createBackupFileLauncher.launch("SinceWhen_Backup.json")
+    }
+
+    private fun importBackup() {
+        importBackupFileLauncher.launch(arrayOf("*/*"))
+    }
+
+
+    private fun showClearDialog() {
+        val prefs = getSharedPreferences("Prefs", MODE_PRIVATE)
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Clear all moments?")
+            .setMessage("This will permanently delete everything stored in your app.")
+            .setPositiveButton("Yes, delete everything") { _, _ ->
+
+                prefs.edit {
+                    remove("list")
+                }
+
+                UpcomingWidgetProvider.refreshWidget(this)
+
+                setResult(RESULT_OK)
+                finish()
+
+                // refresh widget
+                UpcomingWidgetProvider.refreshWidget(this)
+
+                Toast.makeText(this, "All moments deleted", Toast.LENGTH_SHORT).show()
+            }
+            .setNeutralButton("Export backup instead") { _, _ ->
+                createBackupFileLauncher.launch("SinceWhen_Backup.json")
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun writeBackupData(uri: Uri) {
@@ -72,20 +141,25 @@ class SettingsActivity : AppCompatActivity() {
                     // Basic syntax integrity validation check before overriding database cache
                     if (importedJson.trim().startsWith("[")) {
                         getSharedPreferences("Prefs", Context.MODE_PRIVATE)
-                            .edit()
-                            .putString("list", importedJson)
-                            .apply()
+                            .edit {
+                                putString("list", importedJson)
+                            }
 
                         // Tell the system widget engine to update calculations immediately
                         UpcomingWidgetProvider.refreshWidget(this)
 
-                        Toast.makeText(this, "Import complete! Restarting data view.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Import complete! Restarting data view.",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                         // Notify MainActivity to reconstruct lists by setting a result code
                         setResult(RESULT_OK)
                         finish()
                     } else {
-                        Toast.makeText(this, "Invalid backup file structure.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Invalid backup file structure.", Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
             }

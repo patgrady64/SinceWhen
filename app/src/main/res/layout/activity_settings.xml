@@ -1,63 +1,253 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#121212"
-    android:padding="24dp">
+    android:background="#121212">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="32dp">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSettingsBack"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="←"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
 
+        <!-- ================= HEADER ================= -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingVertical="8dp">
+
+            <!-- Back button -->
+            <ImageButton
+                android:id="@+id/btnSettingsBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_media_previous"
+                android:contentDescription="@string/back"
+                app:tint="#FFFFFF"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- SETTINGS TITLE -->
+            <TextView
+                android:id="@+id/txtHeaderTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <!-- ================= APP SETTINGS ================= -->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Settings"
-            android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginStart="16dp"/>
+            android:text="@string/app_settings"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#1E1E1E"
+            app:strokeColor="#333333"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <include
+                    layout="@layout/item_setting"
+                    android:id="@+id/rowTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <include
+                    layout="@layout/item_setting"
+                    android:id="@+id/rowWidget"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ================= BACKUP SECTION ================= -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="BACKUP"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#1E1E1E"
+            app:strokeColor="#333333"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <include
+                    layout="@layout/item_setting"
+                    android:id="@+id/rowExport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <include
+                    layout="@layout/item_setting"
+                    android:id="@+id/rowImport"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ================= SPACING ================= -->
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+
+        <!-- ================= DANGER ZONE ================= -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/danger_zone"
+            android:textColor="#FF6F00"
+            android:textSize="12sp"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="#1A1A1A"
+            app:strokeColor="#FF6F00"
+            app:strokeWidth="1dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <include
+                    layout="@layout/item_setting"
+                    android:id="@+id/rowClearAll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
     </LinearLayout>
+</ScrollView>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Cloud &amp; Local Management"
-        android:textColor="#FF6F00"
-        android:textStyle="bold"
-        android:textSize="14sp"
-        android:layout_marginBottom="16dp"/>
+<!--Clear All Data-->
+<!--Widget Refresh Settings-->
+<!--Theme / Accent Colors-->
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnExportBackup"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Backup to Google Drive / Local"
-        android:textColor="#FFFFFF"
-        android:layout_marginBottom="12dp"
-        android:padding="16dp"/>
+<!--    💾 Export Backup-->
+<!--    Save your moments to a file-->
+<!--    >-->
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnImportBackup"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Import from Google Drive / Local"
-        android:textColor="#FFFFFF"
-        android:padding="16dp"/>
+<!--    📂 Import Backup-->
+<!--    Restore a backup file-->
+<!--    >-->
 
-</LinearLayout>
+<!--    🗑 Clear All Moments-->
+<!--    Delete every tracker-->
+<!--    >-->
+
+<!--    ♻ Reset App-->
+<!--    Erase everything-->
+<!--    >-->
+
+<!--    -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+
+<!--    APPEARANCE-->
+
+<!--    🌙 Dark Theme-->
+
+<!--    🎨 Accent Color-->
+
+<!--    ⬜ Rounded Cards-->
+
+<!--    -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+
+<!--    COUNTDOWN-->
+
+<!--    ⏱ Show Seconds-->
+
+<!--    📅 Show Total Days-->
+
+<!--    🧮 Years / Months / Days-->
+
+<!--    ⚡ Live Countdown-->
+
+<!--    -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+
+<!--    WIDGET-->
+
+<!--    🔄 Refresh Widget-->
+
+<!--    👀 Preview Widget-->
+
+<!--    🎨 Widget Theme-->
+
+<!--    -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+
+<!--    NOTIFICATIONS-->
+
+<!--    ☑ Day Before Reminder-->
+
+<!--    ☑ Anniversary Reminder-->
+
+<!--    ☑ Daily Motivation-->
+
+<!--    -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+
+<!--    ABOUT-->
+
+<!--    Version 1.0-->
+
+<!--    Patrick Grady-->
+
+<!--    Open Source Licenses-->
+
+<!--    Privacy Policy-->
+
+<!--    Send Feedback-->
+
+<!--    Rate SinceWhen-->
+
