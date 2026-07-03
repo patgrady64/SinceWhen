@@ -2,6 +2,7 @@ package com.patgrady64.sincewhen
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,7 +19,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.patgrady64.sincewhen.theme.ThemeActivity
+import com.patgrady64.sincewhen.theme.ThemeApplier
+import com.patgrady64.sincewhen.theme.ThemeManager
+
+
 import java.util.*
+import kotlin.apply
 
 class MainActivity : AppCompatActivity() {
     lateinit var adapter: MomentAdapter
@@ -26,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var header: TextView
     private val countdownHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private lateinit var itemTouchHelper: ItemTouchHelper
+
 
     private val countdownRunnable = object : Runnable {
         override fun run() {
@@ -52,7 +60,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         header = findViewById(R.id.txtHeaderSummary)
+        val fabAdd = findViewById<FloatingActionButton>(R.id.fabAdd)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+
+        ThemeApplier.apply(this)
 
         loadMoments()
         updateHeader()
@@ -125,8 +136,10 @@ class MainActivity : AppCompatActivity() {
         // Attach the optimized handle-driven config to your layout
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
+
+
         // Wire up your Floating Action Button for adding new moments
-        findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAdd).setOnClickListener {
+        fabAdd.setOnClickListener {
             showMomentDialog(null)
         }
 
@@ -142,7 +155,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        countdownHandler.post(countdownRunnable)
+
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+
+        ThemeApplier.apply(this)
+        adapter.notifyDataSetChanged()
+        recyclerView.invalidate()
     }
 
     override fun onPause() {
@@ -326,5 +344,4 @@ class MainActivity : AppCompatActivity() {
             Gson().fromJson(json, type)
         )
     }
-
 }

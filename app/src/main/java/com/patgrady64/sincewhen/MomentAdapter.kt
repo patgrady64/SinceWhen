@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
+import com.patgrady64.sincewhen.theme.ThemeManager
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -27,7 +28,8 @@ class MomentAdapter(
         val txtTitle: TextView = view.findViewById(R.id.txtTitle)
         val txtDuration: TextView = view.findViewById(R.id.txtDuration)
         val btnEdit: ImageButton = view.findViewById(R.id.btnEdit)
-        val dragHandle: ImageView = view.findViewById(R.id.imgDragHandle) // The new handle view mapping
+        val dragHandle: ImageView = view.findViewById(R.id.imgDragHandle)
+
     }
 
     override fun getItemId(position: Int): Long {
@@ -38,44 +40,47 @@ class MomentAdapter(
         // ✅ Inflates item_moment layout explicitly for your app list view
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_moment, parent, false)
         return MomentViewHolder(view)
+
+
     }
     @Suppress("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: MomentViewHolder, position: Int) {
         val moment = moments[position]
+        val theme = ThemeManager.getTheme(holder.itemView.context)
+
         holder.txtTitle.text = moment.title
 
-        // 1. Interpret the database timestamp strictly as UTC midnight
         val utcZone = ZoneId.of("UTC")
-        val eventDate = Instant.ofEpochMilli(moment.timestamp).atZone(utcZone).toLocalDate()
+        val eventDate = Instant.ofEpochMilli(moment.timestamp)
+            .atZone(utcZone)
+            .toLocalDate()
 
-        // 2. Get the current calendar date based on the device's local time zone
-        val targetZone = ZoneId.systemDefault()
-        val todayDate = LocalDate.now(targetZone)
-
-        // 3. Calculate exact calendar days between today and the event
+        val todayDate = LocalDate.now()
         val daysBetween = ChronoUnit.DAYS.between(todayDate, eventDate)
-
         val now = System.currentTimeMillis()
 
-        // Setup the text display dynamically using your safe day calculations
-        when {
+        val (bg, durationText) = when {
             daysBetween == 0L -> {
-                holder.txtDuration.text = "Today"
-                holder.cardView.setCardBackgroundColor(Color.parseColor("#2E7D32")) // Green
+                theme.success to "Today"
             }
             daysBetween > 0L -> {
-                holder.txtDuration.text = "Countdown: ${getCountdownString(moment.timestamp)}"
-                holder.cardView.setCardBackgroundColor(Color.parseColor("#FF6F00")) // Orange
+                theme.warning to "Countdown: ${getCountdownString(moment.timestamp)}"
             }
             else -> {
-                holder.txtDuration.text = "For ${getPastRelativeString(moment.timestamp, now)}"
-                holder.cardView.setCardBackgroundColor(Color.parseColor("#1A237E")) // Blue
+                theme.info to "For ${getPastRelativeString(moment.timestamp, now)}"
             }
         }
 
-        // EDIT BUTTON
+        holder.cardView.setCardBackgroundColor(bg)
+        holder.cardView.strokeColor = theme.cardStroke
+
+        val textColor = getReadableTextColor(bg)
+        holder.txtTitle.setTextColor(textColor)
+        holder.txtDuration.setTextColor(textColor)
+
+        holder.txtDuration.text = durationText
+
         holder.btnEdit.setOnClickListener {
-            holder.itemView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
             (holder.itemView.context as? MainActivity)?.showMomentDialog(moment)
         }
 
@@ -119,5 +124,14 @@ class MomentAdapter(
         val seconds = (diff / 1000) % 60
 
         return "${totalDays}d ${hours}h ${minutes}m ${seconds}s"
+    }
+
+    fun getReadableTextColor(background: Int): Int {
+        val darkness =
+            1 - (0.299 * Color.red(background) +
+                    0.587 * Color.green(background) +
+                    0.114 * Color.blue(background)) / 255
+
+        return if (darkness > 0.5) Color.WHITE else Color.BLACK
     }
 }

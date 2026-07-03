@@ -1,22 +1,22 @@
 package com.patgrady64.sincewhen
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.Gson
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import androidx.core.content.edit
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.patgrady64.sincewhen.theme.ThemeActivity
+import com.patgrady64.sincewhen.theme.ThemeApplier
+import com.patgrady64.sincewhen.theme.ThemeManager
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -34,9 +34,19 @@ class SettingsActivity : AppCompatActivity() {
         uri?.let { readAndRestoreBackup(it) }
     }
 
+    private val themeLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            ThemeApplier.apply(this)
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
+
+
+        val theme = findViewById<View>(R.id.rowTheme)
+
+        ThemeApplier.apply(this)
 
         SettingsRow(findViewById(R.id.rowClearAll))
             .setTitle("Clear All Moments")
@@ -51,7 +61,7 @@ class SettingsActivity : AppCompatActivity() {
         SettingsRow(findViewById(R.id.rowTheme))
             .setTitle("Theme")
             .setSubtitle("Dark mode and colors")
-            .onClick { showComingSoon() }
+            .onClick { themeManager() }
 
         SettingsRow(findViewById(R.id.rowExport))
             .setTitle("Export Backup")
@@ -66,6 +76,16 @@ class SettingsActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btnSettingsBack).setOnClickListener {
             finish()
         }
+
+        theme.setOnClickListener {
+            themeLauncher.launch(Intent(this, ThemeActivity::class.java))
+        }
+    }
+
+
+
+    private fun themeManager(){
+        startActivity(Intent(this, ThemeActivity::class.java))
     }
 
     private fun refreshWidget() {
