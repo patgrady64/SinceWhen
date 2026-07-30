@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardGoogleCalendarChoice"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="92dp"
+        android:paddingStart="14dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="14dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/googleCalendarChoiceIconCard"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/imgGoogleCalendarChoice"
+                android:layout_width="23dp"
+                android:layout_height="23dp"
+                android:layout_gravity="center"
+                android:contentDescription="Calendar"
+                android:src="@drawable/ic_calendar_add" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/txtGoogleCalendarChoiceName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Calendar name"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/imgGoogleCalendarChoiceChevron"
+            app:layout_constraintStart_toEndOf="@id/googleCalendarChoiceIconCard"
+            app:layout_constraintTop_toTopOf="@id/googleCalendarChoiceIconCard" />
+
+        <TextView
+            android:id="@+id/txtGoogleCalendarChoiceAccount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="account@gmail.com"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toStartOf="@id/imgGoogleCalendarChoiceChevron"
+            app:layout_constraintStart_toStartOf="@id/txtGoogleCalendarChoiceName"
+            app:layout_constraintTop_toBottomOf="@id/txtGoogleCalendarChoiceName" />
+
+        <TextView
+            android:id="@+id/txtGoogleCalendarPrimaryBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="Primary"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/txtGoogleCalendarChoiceName"
+            app:layout_constraintTop_toBottomOf="@id/txtGoogleCalendarChoiceAccount" />
+
+        <ImageView
+            android:id="@+id/imgGoogleCalendarChoiceChevron"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="Choose calendar"
+            android:src="@drawable/ic_chevron_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

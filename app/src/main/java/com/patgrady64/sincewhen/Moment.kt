@@ -5,6 +5,8 @@ import java.util.UUID
 data class Moment(
     val id: String = UUID.randomUUID().toString(),
     var title: String,
-    var timestamp: Long, // Changed to 'var' to allow updates
-    val isAllDay: Boolean = false
+    var timestamp: Long,
+    val isAllDay: Boolean = false,
+    var calendarEventId: Long? = null,
+    var calendarId: Long? = null
 )
